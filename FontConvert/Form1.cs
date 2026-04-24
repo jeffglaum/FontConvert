@@ -33,7 +33,7 @@ namespace WindowsFormsApplication1
         public FontConvertForm()
         {
             InitializeComponent();
-
+            this.ResizeRedraw = true;
             charFont = this.Font;
         }
 
@@ -153,11 +153,7 @@ namespace WindowsFormsApplication1
             bool drawSplitline = false;
             for (int x = 0 ; x <= this.Width; x += gridWidth)
             {
-              //  if (useNarrowChar == false && drawSplitline == true)
-              //      formGraphics.DrawLine(splitlinePen, x, 0, x, this.Height);
-              //  else
-                    formGraphics.DrawLine(outlinePen, x, 0, x, this.Height);
-
+                formGraphics.DrawLine(outlinePen, x, 0, x, this.Height);
                 drawSplitline = !drawSplitline;
             }
            
@@ -174,7 +170,7 @@ namespace WindowsFormsApplication1
             int charY = this.MainMenuStrip.Height + 1;
             int charWidth = ((useNarrowChar == true) ? charWidthNarrow : charWidthWide);
             
-            TextFormatFlags textFlags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter;
+            TextFormatFlags textFlags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix;
 
             if (charList != null)
             {
@@ -182,6 +178,11 @@ namespace WindowsFormsApplication1
                 {
                     TextRenderer.DrawText(e.Graphics, Character.ToString(), charFont, new Rectangle(charX, charY, charWidth, charHeight), SystemColors.ControlText, textFlags);
                     charX += (charWidth + 1);
+                    if (charX  >= (this.ClientSize.Width - charWidth))
+                    {
+                        charX = 1;
+                        charY += (charHeight + 1);
+                    }
                 }
             }
         }
@@ -293,7 +294,7 @@ namespace WindowsFormsApplication1
             this.Refresh();
             Application.DoEvents();
 
-            TextFormatFlags textFlags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter;
+            TextFormatFlags textFlags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix;
 
             foreach (char Character in charList)
             {
