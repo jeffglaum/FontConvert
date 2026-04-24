@@ -293,19 +293,18 @@ namespace WindowsFormsApplication1
             this.Refresh();
             Application.DoEvents();
 
+            TextFormatFlags textFlags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter;
+
             foreach (char Character in charList)
             {
 
-                // Take the screenshot of the character.
-                //
-                Rectangle captureRect = new Rectangle(captureX, captureY, charWidth, charHeight);
-
-                gfxScreenshot.CopyFromScreen(captureX,
-                                             captureY,
-                                             0,
-                                             0,
-                                             captureRect.Size,                             
-                                             CopyPixelOperation.SourceCopy);
+                // Render the character directly onto the in-memory bitmap instead of
+                // capturing the screen. CopyFromScreen is fragile (focus, scaling,
+                // occlusion) and can produce empty/blank captures which resulted in
+                // many zero glyphs for narrow mode. Clearing and drawing the text
+                // ensures consistent results.
+                gfxScreenshot.Clear(SystemColors.Control);
+                TextRenderer.DrawText(gfxScreenshot, Character.ToString(), charFont, new Rectangle(0, 0, charWidth, charHeight), SystemColors.ControlText, textFlags);
 
                 // Save the screenshot to the specified path that the user has chosen.
                 //bmpScreenshot.Save("c:\\temp\\orig.bmp", ImageFormat.Bmp);
@@ -418,6 +417,9 @@ namespace WindowsFormsApplication1
             }
 
             outputWindow.glyphText.Text += "  }\r\n";
+
+            // Dispose the graphics object created from the bitmap.
+            gfxScreenshot.Dispose();
 
             // Now show the output window after all capture and text generation is complete.
             outputWindow.Show();
